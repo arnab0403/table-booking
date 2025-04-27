@@ -3,6 +3,7 @@ package com.major.k1.resturant.Controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.major.k1.resturant.DTO.DtoRegUser;
 import com.major.k1.resturant.DTO.LoginDto;
+import com.major.k1.resturant.DTO.LoginRequest;
 import com.major.k1.resturant.DTO.UserChangePassDto;
 import com.major.k1.resturant.Repository.UserRepository;
 import com.major.k1.resturant.Security.JwtUtil;
@@ -63,6 +64,32 @@ public class UserController {
             return ResponseEntity.status(500).body("Failed to save user: " + e.getMessage());
         }
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(),
+                loginRequest.getPassword()
+        ));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String username=authentication.getName();
+        String token = jwtUtil.generateToken(username);
+        return  ResponseEntity.ok(Map.of(
+                "token", token,
+                "message", "Login successful"
+
+        ));
+
+    }
+
+
+
+
+
+
+
+
     @PutMapping("/changepassword")
     public String changepassword(@RequestBody UserChangePassDto userChangePassDto , Authentication authentication){
         String username=authentication.getName();

@@ -47,7 +47,7 @@ public class SecurityConfig {
 
                 // Define authorization rules
                 .authorizeHttpRequests(auth -> auth
-
+                        .requestMatchers("/admin/*").hasAnyAuthority("user","admin")
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
