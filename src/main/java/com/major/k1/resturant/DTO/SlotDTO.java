@@ -16,6 +16,11 @@ public class SlotDTO {
         this.available = available;
     }
 
+    public SlotDTO(String time, boolean available) {
+        this.time = time;
+        this.available = available;
+    }
+
     // Getters and setters
     public Long getId() {
         return id;

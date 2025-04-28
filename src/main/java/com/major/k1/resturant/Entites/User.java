@@ -24,5 +24,7 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> roles= new HashSet<>();
     private String image;
+    @OneToMany(mappedBy = "owner")
+    private Set<Restaurant> restaurants = new HashSet<>();
 
 }
