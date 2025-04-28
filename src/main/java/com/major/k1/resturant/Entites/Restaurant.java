@@ -1,6 +1,7 @@
 package com.major.k1.resturant.Entites;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -27,4 +28,23 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SlotTime> slotTimes = new ArrayList<>();
 
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
+    //changes
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    private String place;
+    private String openTime;
+
+    @ElementCollection
+    @CollectionTable(name = "restaurant_photos", joinColumns = @JoinColumn(name = "restaurant_id"))
+    @Column(name = "photo_name") // This will store the file names of the photos
+    private List<String> photos = new ArrayList<>();
+
 }
+//description , photos , address

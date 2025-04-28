@@ -1,14 +1,20 @@
 package com.major.k1.resturant.Controller;
 
 import com.major.k1.resturant.DTO.RestaurantDTO;
+import com.major.k1.resturant.DTO.RestaurantDetailsDTO;
 import com.major.k1.resturant.DTO.RestaurantRequestDTO;
+import com.major.k1.resturant.DTO.TimeSlotDetailsDTO;
 import com.major.k1.resturant.Entites.Restaurant;
+import com.major.k1.resturant.Entites.SlotTime;
 import com.major.k1.resturant.Repository.RestaurantRepository;
 import com.major.k1.resturant.Service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +28,16 @@ public class RestaurantController {
     private RestaurantRepository restaurantRepository;
 
     //Add New Restaurant
-    @PostMapping("/addrestaurant")
-    public ResponseEntity<Restaurant> createRestaurant(@RequestBody RestaurantRequestDTO dto) {
-        Restaurant savedRestaurant = restaurantService.createRestaurant(dto);
+    @PostMapping(value = "/addrestaurant",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Restaurant> createRestaurant(
+            @RequestPart("restaurant") RestaurantRequestDTO restaurantDTO,
+            @RequestPart(value = "photos", required = false) List<MultipartFile> photos) {
+
+        // Set photos in DTO if they exist
+        restaurantDTO.setPhotos(photos);
+
+        Restaurant savedRestaurant = restaurantService.createRestaurant(restaurantDTO);
         return new ResponseEntity<>(savedRestaurant, HttpStatus.CREATED);
     }
 
@@ -36,14 +49,9 @@ public class RestaurantController {
     }
 
     // Endpoint to fetch a specific restaurant by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Restaurant> getRestaurantById(@PathVariable Long id) {
-        Optional<Restaurant> restaurant = restaurantRepository.findById(id);
-        if (restaurant.isPresent()) {
-            return ResponseEntity.ok(restaurant.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/restaurant/{id}")
+    public RestaurantDetailsDTO getRestaurantDetails(@PathVariable Long id) {
+        return restaurantService.getRestaurantDetails(id);
     }
 
 
@@ -94,6 +102,32 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurant);
     }
 
+
+
+    @GetMapping("/restaurants/owned")
+    public ResponseEntity<List<RestaurantDTO>> getRestaurantsForOwner(Authentication authentication) {
+        // Fetch the username from the Authentication object
+        String username = authentication.getName();  // This gives you the logged-in user's username
+
+        // Get the restaurants owned by the logged-in user
+        List<RestaurantDTO> restaurants = restaurantService.getRestaurantsForOwner(username);
+        return ResponseEntity.ok(restaurants);
+    }
+    //updated
+
+    //slot time
+
+    @PutMapping("/restaurant/{restaurantId}/slot/{slotId}/availability")
+    public ResponseEntity<SlotTime> updateSlotAvailability(@PathVariable Long restaurantId,
+                                                           @PathVariable Long slotId,
+                                                           @RequestParam boolean available) {
+        SlotTime updatedSlot = restaurantService.updateSlotAvailability(restaurantId, slotId, available);
+        if (updatedSlot != null) {
+            return new ResponseEntity<>(updatedSlot, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
 
 }

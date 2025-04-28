@@ -1,27 +1,15 @@
 package com.major.k1.resturant.DTO;
 
-import lombok.Data;
-//For fetching time slots for restaurant list
-@Data
-public class SlotDTO {
 
+import lombok.AllArgsConstructor;
+//for fetching specific restaurant data
+@AllArgsConstructor
+public class TimeSlotDetailsDTO {
     private Long id;
     private String time;
     private boolean available;
 
-    // Constructor
-    public SlotDTO(Long id, String time, boolean available) {
-        this.id = id;
-        this.time = time;
-        this.available = available;
-    }
-
-    public SlotDTO(String time, boolean available) {
-        this.time = time;
-        this.available = available;
-    }
-
-    // Getters and setters
+    // Getters and Setters
     public Long getId() {
         return id;
     }

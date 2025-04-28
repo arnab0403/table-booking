@@ -4,6 +4,7 @@ import com.major.k1.resturant.Entites.Coordinates;
 
 import java.util.List;
 
+//for fetching restaurant list
 public class RestaurantDTO{
 
     private Long id;
