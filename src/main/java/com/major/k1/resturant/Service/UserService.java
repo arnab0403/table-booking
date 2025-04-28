@@ -7,6 +7,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Random;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.major.k1.resturant.DTO.OtpUserStore;
 import com.major.k1.resturant.DTO.PendingUser;
@@ -28,28 +29,42 @@ public class UserService {
     @Autowired
     private OtpUserStore otpUserStore;
 
-    @Autowired
+    public boolean registerTemp(String userJson, MultipartFile file) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(userJson);
+        String email = jsonNode.get("email").asText();
+
+        boolean userExists = userRepository.findByEmail(email).isPresent();
+
+        if (!userExists) { // Important: Only register if user does NOT exist
+            DtoRegUser user = objectMapper.readValue(userJson, DtoRegUser.class);
+            String otp = String.format("%06d", new Random().nextInt(999999));
+
+            // Save the image to a temp path
+            String tempDir = System.getProperty("java.io.tmpdir") + File.separator + "uploads";
+            new File(tempDir).mkdirs();
+            String imageName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            File savedFile = new File(tempDir, imageName);
+            file.transferTo(savedFile);
+
+            PendingUser pendingUser = new PendingUser(user, savedFile.getAbsolutePath(), otp, System.currentTimeMillis());
+            otpUserStore.save(user.getEmail(), pendingUser);
+            sendOtpEmail(user.getEmail(), otp);
+            return true;
+        } else {
+            return false; // User already exists
+        }
+    }
+
     private JavaMailSender mailSender;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public void registerTemp(String userJson, MultipartFile file) throws IOException {
-        DtoRegUser user = new ObjectMapper().readValue(userJson, DtoRegUser.class);
-        String otp = String.format("%06d", new Random().nextInt(999999));
 
-        // Save the image to a temp path
-        String tempDir = System.getProperty("java.io.tmpdir") + File.separator + "uploads";
-        new File(tempDir).mkdirs();
-        String imageName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        File savedFile = new File(tempDir, imageName);
-        file.transferTo(savedFile);
 
-        PendingUser pendingUser = new PendingUser(user, savedFile.getAbsolutePath(), otp, System.currentTimeMillis());
-        otpUserStore.save(user.getEmail(), pendingUser);
-        sendOtpEmail(user.getEmail(), otp);
-    }
+
 
     public boolean verifyOtp(String email, String otp, PasswordEncoder passwordEncoder, UserRepository userRepository) throws IOException {
         PendingUser pending = otpUserStore.get(email);
