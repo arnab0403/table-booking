@@ -44,8 +44,12 @@ public class UserController {
     public ResponseEntity<String> registerTemp(@RequestPart("user") String userJson,
                                                @RequestPart("image") MultipartFile file) {
         try {
-            userService.registerTemp(userJson, file);
+            boolean userexist=userService.registerTemp(userJson, file);
+            if (userexist){
             return ResponseEntity.ok("OTP sent to email.");
+            }else{
+                return ResponseEntity.status(409).body("User Already Exist");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
