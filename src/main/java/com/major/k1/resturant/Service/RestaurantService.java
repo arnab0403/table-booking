@@ -191,12 +191,25 @@ public class RestaurantService {
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
 
         List<TimeSlotDetailsDTO> slotTimes = restaurant.getSlotTimes().stream()
-                .map(slot -> new TimeSlotDetailsDTO(slot.getId(), slot.getTime(), slot.isAvailable()))
+                .map(slot -> new TimeSlotDetailsDTO(
+                        slot.getId(),
+                        slot.getTime(),
+                        slot.isAvailable()
+                ))
+                .collect(Collectors.toList());
+
+        // Build photo URLs (assuming photos are stored with base URL)
+        List<String> photoUrls = restaurant.getPhotos().stream()
+                .map(photoName -> "/api/restaurants/photos/" + photoName)
                 .collect(Collectors.toList());
 
         return new RestaurantDetailsDTO(
                 restaurant.getId(),
                 restaurant.getName(),
+                restaurant.getDescription(),
+                restaurant.getPlace(),
+                restaurant.getOpenTime(),
+                photoUrls, // Now includes full photo URLs
                 restaurant.getMenu(),
                 restaurant.getBestDishes(),
                 restaurant.getCoordinates(),

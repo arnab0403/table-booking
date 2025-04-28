@@ -13,6 +13,10 @@ import java.util.List;
 public class RestaurantDetailsDTO {
     private Long id;
     private String name;
+    private String description;
+    private String place;
+    private String openTime;
+    private List<String> photos; // Stores photo file names or URLs
     private List<String> menu;
     private List<String> bestDishes;
     private Coordinates coordinates;
