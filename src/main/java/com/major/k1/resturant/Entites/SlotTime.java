@@ -1,5 +1,6 @@
 package com.major.k1.resturant.Entites;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 

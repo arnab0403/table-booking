@@ -1,7 +1,9 @@
 package com.major.k1.resturant.Controller;
 
 import com.major.k1.resturant.DTO.RestaurantDTO;
+import com.major.k1.resturant.DTO.RestaurantDetailsDTO;
 import com.major.k1.resturant.DTO.RestaurantRequestDTO;
+import com.major.k1.resturant.DTO.TimeSlotDetailsDTO;
 import com.major.k1.resturant.Entites.Restaurant;
 import com.major.k1.resturant.Repository.RestaurantRepository;
 import com.major.k1.resturant.Service.RestaurantService;
@@ -36,14 +38,9 @@ public class RestaurantController {
     }
 
     // Endpoint to fetch a specific restaurant by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Restaurant> getRestaurantById(@PathVariable Long id) {
-        Optional<Restaurant> restaurant = restaurantRepository.findById(id);
-        if (restaurant.isPresent()) {
-            return ResponseEntity.ok(restaurant.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/restaurant/{id}")
+    public RestaurantDetailsDTO getRestaurantDetails(@PathVariable Long id) {
+        return restaurantService.getRestaurantDetails(id);
     }
 
 

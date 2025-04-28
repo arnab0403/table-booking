@@ -1,9 +1,7 @@
 package com.major.k1.resturant.Service;
 
 
-import com.major.k1.resturant.DTO.RestaurantDTO;
-import com.major.k1.resturant.DTO.RestaurantRequestDTO;
-import com.major.k1.resturant.DTO.SlotDTO;
+import com.major.k1.resturant.DTO.*;
 import com.major.k1.resturant.Entites.Restaurant;
 import com.major.k1.resturant.Entites.SlotTime;
 import com.major.k1.resturant.Repository.RestaurantRepository;
@@ -112,6 +110,23 @@ public class RestaurantService {
 
 
 
+    public RestaurantDetailsDTO getRestaurantDetails(Long restaurantId) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+
+        List<TimeSlotDetailsDTO> slotTimes = restaurant.getSlotTimes().stream()
+                .map(slot -> new TimeSlotDetailsDTO(slot.getId(), slot.getTime(), slot.isAvailable()))
+                .collect(Collectors.toList());
+
+        return new RestaurantDetailsDTO(
+                restaurant.getId(),
+                restaurant.getName(),
+                restaurant.getMenu(),
+                restaurant.getBestDishes(),
+                restaurant.getCoordinates(),
+                slotTimes
+        );
+    }
 
 
 }
