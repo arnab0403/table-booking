@@ -10,9 +10,11 @@ import com.major.k1.resturant.Repository.RestaurantRepository;
 import com.major.k1.resturant.Service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,9 +28,16 @@ public class RestaurantController {
     private RestaurantRepository restaurantRepository;
 
     //Add New Restaurant
-    @PostMapping("/addrestaurant")
-    public ResponseEntity<Restaurant> createRestaurant(@RequestBody RestaurantRequestDTO dto) {
-        Restaurant savedRestaurant = restaurantService.createRestaurant(dto);
+    @PostMapping(value = "/addrestaurant",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Restaurant> createRestaurant(
+            @RequestPart("restaurant") RestaurantRequestDTO restaurantDTO,
+            @RequestPart(value = "photos", required = false) List<MultipartFile> photos) {
+
+        // Set photos in DTO if they exist
+        restaurantDTO.setPhotos(photos);
+
+        Restaurant savedRestaurant = restaurantService.createRestaurant(restaurantDTO);
         return new ResponseEntity<>(savedRestaurant, HttpStatus.CREATED);
     }
 

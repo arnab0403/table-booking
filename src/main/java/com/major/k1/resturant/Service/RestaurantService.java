@@ -9,13 +9,21 @@ import com.major.k1.resturant.Repository.RestaurantRepository;
 import com.major.k1.resturant.Repository.SlotTimeRepository;
 import com.major.k1.resturant.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 @Service
 public class RestaurantService {
@@ -25,41 +33,86 @@ public class RestaurantService {
 
     @Autowired
     private UserRepository userRepository;
+   //Add restaurant
+    @Value("${upload.directory}") // Define this in your application.properties
+    private String uploadDirectory;
 
-    //Add Restaurant method
     public Restaurant createRestaurant(RestaurantRequestDTO dto) {
-        // Get the Authentication object
+        // Authentication and owner retrieval
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
 
-        // Get the username (or email) of the currently logged-in user
-        String currentUsername = authentication.getName(); // username is typically stored as the principal
-
-        // Fetch the owner from the database based on the logged-in user's username/email
         User owner = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Create the restaurant entity
+        // Create restaurant entity
         Restaurant restaurant = new Restaurant();
         restaurant.setName(dto.getName());
+        restaurant.setDescription(dto.getDescription());
+        restaurant.setPlace(dto.getPlace());
+        restaurant.setOpenTime(dto.getOpenTime());
         restaurant.setMenu(dto.getMenu());
         restaurant.setBestDishes(dto.getBestDishes());
         restaurant.setCoordinates(dto.getCoordinates());
-        restaurant.setOwner(owner); // Set the logged-in user as the owner
+        restaurant.setOwner(owner);
 
-        // Create SlotTime entities
-        List<SlotTime> slotTimeList = dto.getSlotTimes().stream().map(time -> {
-            SlotTime slot = new SlotTime();
-            slot.setTime(time);
-            slot.setAvailable(true); // default to available
-            slot.setRestaurant(restaurant); // link back to the restaurant
-            return slot;
-        }).collect(Collectors.toList());
+        // Handle photo uploads
+        if (dto.getPhotos() != null && !dto.getPhotos().isEmpty()) {
+            List<String> photoNames = handleFileUploads(dto.getPhotos());
+            restaurant.setPhotos(photoNames);
+        }
+
+        // Handle slot times
+        List<SlotTime> slotTimeList = dto.getSlotTimes().stream()
+                .map(time -> {
+                    SlotTime slot = new SlotTime();
+                    slot.setTime(time);
+                    slot.setAvailable(true);
+                    slot.setRestaurant(restaurant);
+                    return slot;
+                })
+                .collect(Collectors.toList());
 
         restaurant.setSlotTimes(slotTimeList);
 
-        // Save the restaurant in the database
         return restaurantRepository.save(restaurant);
     }
+
+    private List<String> handleFileUploads(List<MultipartFile> files) {
+        List<String> fileNames = new ArrayList<>();
+        Path uploadPath = Paths.get(uploadDirectory);
+
+        try {
+            // Create directory if it doesn't exist
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    // Generate unique filename
+                    String originalFileName = file.getOriginalFilename();
+                    String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+                    String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+
+                    // Save file
+                    Path filePath = uploadPath.resolve(uniqueFileName);
+                    file.transferTo(filePath.toFile());
+
+                    fileNames.add(uniqueFileName);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store files: " + e.getMessage());
+        }
+
+        return fileNames;
+    }
+
+
+
+
+
 
          // Menu  add method
     public Restaurant addMenuItem(Long restaurantId, String menuItem) {
@@ -174,6 +227,8 @@ public class RestaurantService {
                 .collect(Collectors.toList());
     }
 
+
+
     private RestaurantDTO convertToDTO(Restaurant restaurant) {
         // Convert SlotTime entities to SlotDTOs
         List<SlotDTO> slotDTOs = restaurant.getSlotTimes().stream()
@@ -190,14 +245,14 @@ public class RestaurantService {
                 slotDTOs
         );
     }
-    // updated
 
 
-    //slottime
+
+
     @Autowired
     private SlotTimeRepository slotTimeRepository;
 
-    // Other service methods...
+    // updates time slots
 
     public SlotTime updateSlotAvailability(Long restaurantId, Long slotId, boolean available) {
         Optional<Restaurant> restaurant = restaurantRepository.findById(restaurantId);

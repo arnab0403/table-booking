@@ -33,5 +33,18 @@ public class Restaurant {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
+    //changes
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    private String place;
+    private String openTime;
+
+    @ElementCollection
+    @CollectionTable(name = "restaurant_photos", joinColumns = @JoinColumn(name = "restaurant_id"))
+    @Column(name = "photo_name") // This will store the file names of the photos
+    private List<String> photos = new ArrayList<>();
+
 }
 //description , photos , address

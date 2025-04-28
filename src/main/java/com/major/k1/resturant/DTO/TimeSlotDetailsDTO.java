@@ -2,7 +2,7 @@ package com.major.k1.resturant.DTO;
 
 
 import lombok.AllArgsConstructor;
-//for fetching specifi restaurant deta
+//for fetching specific restaurant data
 @AllArgsConstructor
 public class TimeSlotDetailsDTO {
     private Long id;
