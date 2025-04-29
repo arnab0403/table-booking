@@ -172,10 +172,14 @@ public class RestaurantService {
                     .map(slotTime -> new SlotDTO(slotTime.getId(), slotTime.getTime(), slotTime.isAvailable()))
                     .collect(Collectors.toList());
 
-            // Return RestaurantDTO
+            // Return RestaurantDTO with all fields
             return new RestaurantDTO(
                     restaurant.getId(),
                     restaurant.getName(),
+                    restaurant.getDescription(),
+                    restaurant.getPlace(),
+                    restaurant.getOpenTime(),
+                    restaurant.getPhotos(),
                     restaurant.getMenu(),
                     restaurant.getBestDishes(),
                     restaurant.getCoordinates(),
