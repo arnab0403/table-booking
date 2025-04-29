@@ -3,6 +3,7 @@ package com.major.k1.resturant.Controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.major.k1.resturant.DTO.DtoRegUser;
 import com.major.k1.resturant.DTO.LoginDto;
+import com.major.k1.resturant.Entites.User;
 import com.major.k1.resturant.DTO.LoginRequest;
 import com.major.k1.resturant.DTO.UserChangePassDto;
 import com.major.k1.resturant.Repository.UserRepository;
@@ -44,11 +45,11 @@ public class UserController {
     public ResponseEntity<String> registerTemp(@RequestPart("user") String userJson,
                                                @RequestPart("image") MultipartFile file) {
         try {
-            boolean userexist=userService.registerTemp(userJson, file);
-            if (userexist){
+            String userexist=userService.registerTemp(userJson, file);
+            if (userexist.equals("Success")){
             return ResponseEntity.ok("OTP sent to email.");
             }else{
-                return ResponseEntity.status(409).body("User Already Exist");
+                return ResponseEntity.status(409).body(userexist);
             }
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
@@ -105,6 +106,27 @@ public class UserController {
             return "failed";
         }
     }
+
+    @GetMapping("/auth/check")
+    public ResponseEntity<?> checkLoginStatus(Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName(); // this is the username
+            // Load your actual User entity from the DB
+            User user = userRepository.findByUsername(username)
+                    .orElse(null);
+
+            if (user != null) {
+                return ResponseEntity.ok(user);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found in DB");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+        }
+    }
+
+
+
 
 
 }
