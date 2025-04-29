@@ -106,7 +106,14 @@ public class UserController {
         }
     }
 
-
+    @GetMapping("/auth/check")
+    public ResponseEntity<String> checkLoginStatus(Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            return ResponseEntity.ok("User is logged in: " + authentication.getName());
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+        }
+    }
 
 
 
