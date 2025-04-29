@@ -56,7 +56,7 @@ public class RestaurantController {
         return new ResponseEntity<>(savedRestaurant, HttpStatus.CREATED);
     }
 
-
+      // all restaurant
     @GetMapping("/resall")
     public ResponseEntity<List<RestaurantDTO>> getAllRestaurants() {
         List<RestaurantDTO> restaurantDTOs = restaurantService.getAllRestaurants();
@@ -143,7 +143,7 @@ public class RestaurantController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-//photos
+
 
 
 
