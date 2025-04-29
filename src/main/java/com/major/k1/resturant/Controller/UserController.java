@@ -1,11 +1,8 @@
 package com.major.k1.resturant.Controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.major.k1.resturant.DTO.DtoRegUser;
-import com.major.k1.resturant.DTO.LoginDto;
+import com.major.k1.resturant.DTO.*;
 import com.major.k1.resturant.Entites.User;
-import com.major.k1.resturant.DTO.LoginRequest;
-import com.major.k1.resturant.DTO.UserChangePassDto;
 import com.major.k1.resturant.Repository.UserRepository;
 import com.major.k1.resturant.Security.JwtUtil;
 import com.major.k1.resturant.Service.UserService;
@@ -110,13 +107,11 @@ public class UserController {
     @GetMapping("/auth/check")
     public ResponseEntity<?> checkLoginStatus(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName(); // this is the username
-            // Load your actual User entity from the DB
-            User user = userRepository.findByUsername(username)
-                    .orElse(null);
-
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username).orElse(null);
             if (user != null) {
-                return ResponseEntity.ok(user);
+                UserDTO userDTO = new UserDTO(user);
+                return ResponseEntity.ok(userDTO);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found in DB");
             }
@@ -124,6 +119,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
         }
     }
+
 
 
 
