@@ -5,16 +5,32 @@ import com.major.k1.resturant.Entites.Coordinates;
 import java.util.List;
 
 //for fetching restaurant list
-public class RestaurantDTO{
-
+public class RestaurantDTO {
     private Long id;
     private String name;
+    private String description;
+    private String place;
+    private String openTime;
+    private List<String> photos;
     private List<String> menu;
     private List<String> bestDishes;
-    private Coordinates coordinates;  // Coordinates as embedded object
-    private List<SlotDTO> slotTimes;  // List of slot times with availability status
+    private Coordinates coordinates;
+    private List<SlotDTO> slotTimes;
 
-    // Constructor
+    public RestaurantDTO(Long id, String name, String description, String place, String openTime,
+                         List<String> photos, List<String> menu, List<String> bestDishes,
+                         Coordinates coordinates, List<SlotDTO> slotTimes) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.place = place;
+        this.openTime = openTime;
+        this.photos = photos;
+        this.menu = menu;
+        this.bestDishes = bestDishes;
+        this.coordinates = coordinates;
+        this.slotTimes = slotTimes;
+    }
     public RestaurantDTO(Long id, String name, List<String> menu, List<String> bestDishes,
                          Coordinates coordinates, List<SlotDTO> slotTimes) {
         this.id = id;
@@ -25,7 +41,7 @@ public class RestaurantDTO{
         this.slotTimes = slotTimes;
     }
 
-    // Getters and setters
+    // Getters and setters for all fields
     public Long getId() {
         return id;
     }
@@ -40,6 +56,38 @@ public class RestaurantDTO{
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPlace() {
+        return place;
+    }
+
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
+    public String getOpenTime() {
+        return openTime;
+    }
+
+    public void setOpenTime(String openTime) {
+        this.openTime = openTime;
+    }
+
+    public List<String> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<String> photos) {
+        this.photos = photos;
     }
 
     public List<String> getMenu() {
