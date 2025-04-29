@@ -34,13 +34,13 @@ public class UserService {
         JsonNode jsonNode = objectMapper.readTree(userJson);
         String email = jsonNode.get("email").asText();
 
-        boolean userExists = userRepository.findByEmail(email).isPresent();
+        User existingUser = userRepository.findByEmail(email);
+        boolean userExists = (existingUser != null);
 
-        if (!userExists) { // Important: Only register if user does NOT exist
+        if (!userExists) {
             DtoRegUser user = objectMapper.readValue(userJson, DtoRegUser.class);
             String otp = String.format("%06d", new Random().nextInt(999999));
 
-            // Save the image to a temp path
             String tempDir = System.getProperty("java.io.tmpdir") + File.separator + "uploads";
             new File(tempDir).mkdirs();
             String imageName = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -52,10 +52,11 @@ public class UserService {
             sendOtpEmail(user.getEmail(), otp);
             return true;
         } else {
-            return false; // User already exists
+            return false;
         }
     }
 
+    @Autowired
     private JavaMailSender mailSender;
     @Autowired
     private UserRepository userRepository;
