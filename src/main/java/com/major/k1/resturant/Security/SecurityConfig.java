@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers("/admin/resall","/admin/restaurant/{id}").permitAll()
+                        .requestMatchers("/user/**").permitAll()
                         .requestMatchers("/admin/**").hasAnyAuthority("admin")
                         .requestMatchers("/photos/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
