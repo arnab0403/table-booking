@@ -49,6 +49,7 @@ public class RestaurantController {
             @RequestPart("restaurant") RestaurantRequestDTO restaurantDTO,
             @RequestPart(value = "photos", required = false) List<MultipartFile> photos) {
 
+        System.out.println("Received totalSeats: " + restaurantDTO.getTotalSeats());
         // Set photos in DTO if they exist
         restaurantDTO.setPhotos(photos);
 
@@ -142,6 +143,14 @@ public class RestaurantController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+
+    // owner specific restaurant delete
+    @DeleteMapping("/delete/res/{id}")
+    public ResponseEntity<?> deleteRestaurant(@PathVariable Long id, Authentication authentication) {
+        restaurantService.deleteRestaurant(id, authentication);
+        return ResponseEntity.ok("Restaurant deleted successfully");
     }
 
 

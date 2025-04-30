@@ -16,6 +16,6 @@ public class RestaurantRequestDTO {
     private Coordinates coordinates;
     private List<String> slotTimes;
     private List<MultipartFile> photos; // For file uploads
-
+    private int totalSeats;
     // Getters and Setters
 }

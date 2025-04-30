@@ -8,8 +8,10 @@ import com.major.k1.resturant.Entites.User;
 import com.major.k1.resturant.Repository.RestaurantRepository;
 import com.major.k1.resturant.Repository.SlotTimeRepository;
 import com.major.k1.resturant.Repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -55,6 +57,7 @@ public class RestaurantService {
         restaurant.setBestDishes(dto.getBestDishes());
         restaurant.setCoordinates(dto.getCoordinates());
         restaurant.setOwner(owner);
+        restaurant.setTotalSeats(dto.getTotalSeats()); // 👈 Set total seats
 
         // Handle photo uploads
         if (dto.getPhotos() != null && !dto.getPhotos().isEmpty()) {
@@ -62,12 +65,13 @@ public class RestaurantService {
             restaurant.setPhotos(photoNames);
         }
 
-        // Handle slot times
+        // Handle slot times and set availableSeats for each
         List<SlotTime> slotTimeList = dto.getSlotTimes().stream()
                 .map(time -> {
                     SlotTime slot = new SlotTime();
                     slot.setTime(time);
                     slot.setAvailable(true);
+                    slot.setAvailableSeats(dto.getTotalSeats()); // 👈 Initialize slot with totalSeats
                     slot.setRestaurant(restaurant);
                     return slot;
                 })
@@ -198,13 +202,14 @@ public class RestaurantService {
                 .map(slot -> new TimeSlotDetailsDTO(
                         slot.getId(),
                         slot.getTime(),
-                        slot.isAvailable()
+                        slot.isAvailable(),
+                        slot.getAvailableSeats()
                 ))
                 .collect(Collectors.toList());
 
         // Build photo URLs (assuming photos are stored with base URL)
         List<String> photoUrls = restaurant.getPhotos().stream()
-                .map(photoName -> "/api/restaurants/photos/" + photoName)
+                .map(photoName ->  photoName)
                 .collect(Collectors.toList());
 
         return new RestaurantDetailsDTO(
@@ -282,6 +287,41 @@ public class RestaurantService {
             }
         }
         return null;  // Return null if the slot or restaurant is not found
+    }
+
+
+    // specifi restaurant delete
+
+    @Value("${upload.directory}")
+    private String uploadDir;
+    public void deleteRestaurant(Long restaurantId, Authentication authentication) {
+        String username = authentication.getName();
+
+        // Get the logged-in user
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        // Get the restaurant
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new EntityNotFoundException("Restaurant not found"));
+
+        // Verify ownership
+        if (!restaurant.getOwner().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("You are not the owner of this restaurant");
+        }
+
+        // Delete photo files from the file system
+        for (String photoName : restaurant.getPhotos()) {
+            Path photoPath = Paths.get(uploadDir, photoName);
+            try {
+                Files.deleteIfExists(photoPath);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to delete photo file: " + photoName, e);
+            }
+        }
+
+        // Delete restaurant and cascade all linked entities
+        restaurantRepository.delete(restaurant);
     }
 
 

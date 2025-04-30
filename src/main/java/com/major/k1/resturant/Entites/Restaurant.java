@@ -45,6 +45,8 @@ public class Restaurant {
     @CollectionTable(name = "restaurant_photos", joinColumns = @JoinColumn(name = "restaurant_id"))
     @Column(name = "photo_name") // This will store the file names of the photos
     private List<String> photos = new ArrayList<>();
-
+    //new
+    @Column(nullable = false)
+    private int totalSeats;
 }
 //description , photos , address

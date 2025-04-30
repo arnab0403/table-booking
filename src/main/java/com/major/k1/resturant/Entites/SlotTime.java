@@ -20,5 +20,7 @@ public class SlotTime {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
+    @Column(nullable = false)
+    private int availableSeats;
     // Getters and Setters
 }
