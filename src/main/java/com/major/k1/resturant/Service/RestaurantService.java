@@ -9,6 +9,7 @@ import com.major.k1.resturant.Repository.RestaurantRepository;
 import com.major.k1.resturant.Repository.SlotTimeRepository;
 import com.major.k1.resturant.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
@@ -222,7 +223,8 @@ public class RestaurantService {
                 restaurant.getMenu(),
                 restaurant.getBestDishes(),
                 restaurant.getCoordinates(),
-                slotTimes
+                slotTimes,
+                restaurant.getTotalSeats()
         );
     }
 
@@ -322,6 +324,17 @@ public class RestaurantService {
 
         // Delete restaurant and cascade all linked entities
         restaurantRepository.delete(restaurant);
+    }
+
+    //reset all seats of the specific restaurant
+
+    @Transactional
+    public void resetAvailableSeats(Long restaurantId) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+
+        int totalSeats = restaurant.getTotalSeats();
+        slotTimeRepository.resetSlotsByRestaurantId(restaurantId, totalSeats);
     }
 
 

@@ -7,6 +7,7 @@ import com.major.k1.resturant.DTO.TimeSlotDetailsDTO;
 import com.major.k1.resturant.Entites.Restaurant;
 import com.major.k1.resturant.Entites.SlotTime;
 import com.major.k1.resturant.Repository.RestaurantRepository;
+import com.major.k1.resturant.Service.BookingService;
 import com.major.k1.resturant.Service.RestaurantService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,7 +42,8 @@ public class RestaurantController {
     private RestaurantService restaurantService;
     @Autowired
     private RestaurantRepository restaurantRepository;
-
+    @Autowired
+    private BookingService bookingService;
     //Add New Restaurant
     @PostMapping(value = "/addrestaurant",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -153,8 +155,12 @@ public class RestaurantController {
         return ResponseEntity.ok("Restaurant deleted successfully");
     }
 
-
-
+    //reset all slots of the specific restaurant
+    @PostMapping("/restaurant/{restaurantId}/reset-slots")
+    public ResponseEntity<String> resetSlots(@PathVariable Long restaurantId) {
+        restaurantService.resetAvailableSeats(restaurantId);
+        return ResponseEntity.ok("All slot seats reset successfully.");
+    }
 
 
 

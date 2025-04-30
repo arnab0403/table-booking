@@ -21,4 +21,5 @@ public class RestaurantDetailsDTO {
     private List<String> bestDishes;
     private Coordinates coordinates;
     private List<TimeSlotDetailsDTO> slotTimes;
+    private int totalSeats;
 }
