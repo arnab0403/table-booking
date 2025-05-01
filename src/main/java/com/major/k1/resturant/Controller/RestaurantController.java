@@ -1,14 +1,14 @@
 package com.major.k1.resturant.Controller;
 
-import com.major.k1.resturant.DTO.RestaurantDTO;
-import com.major.k1.resturant.DTO.RestaurantDetailsDTO;
-import com.major.k1.resturant.DTO.RestaurantRequestDTO;
-import com.major.k1.resturant.DTO.TimeSlotDetailsDTO;
+import com.major.k1.resturant.DTO.*;
 import com.major.k1.resturant.Entites.CurrentBooking;
 import com.major.k1.resturant.Entites.Restaurant;
 import com.major.k1.resturant.Entites.SlotTime;
+import com.major.k1.resturant.Entites.User;
 import com.major.k1.resturant.Repository.CurrentBookingRepository;
 import com.major.k1.resturant.Repository.RestaurantRepository;
+import com.major.k1.resturant.Repository.SlotTimeRepository;
+import com.major.k1.resturant.Repository.UserRepository;
 import com.major.k1.resturant.Service.BookingService;
 import com.major.k1.resturant.Service.RestaurantService;
 
@@ -48,6 +48,10 @@ public class RestaurantController {
     private BookingService bookingService;
     @Autowired
     private CurrentBookingRepository currentBookingRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private SlotTimeRepository slotTimeRepository;
     //Add New Restaurant
     @PostMapping(value = "/addrestaurant",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -179,6 +183,20 @@ public class RestaurantController {
      List<CurrentBooking> bookings = currentBookingRepository.findByRestaurantId(restaurantId);
      return ResponseEntity.ok(bookings);
  }
+
+    @GetMapping("/user/{id}")
+    public UserDTO userbyid(@PathVariable Long id){
+        User user=userRepository.findById(id) .orElseThrow(() -> new RuntimeException("id not found"));
+        UserDTO userDTO = new UserDTO(user);
+        return userDTO;
+    }
+
+    @GetMapping("/slotBookid/{id}")
+    public SlotDTO slotdetails(@PathVariable Long id){
+        SlotTime slotTime=  slotTimeRepository.findById(id) .orElseThrow(null);
+        SlotDTO slotDTO= new SlotDTO(slotTime.getTime());
+        return slotDTO;
+    }
 
 }
 

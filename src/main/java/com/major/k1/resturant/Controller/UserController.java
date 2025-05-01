@@ -84,6 +84,12 @@ public class UserController {
         ));
 
     }
+    @GetMapping("/user/{id}")
+    public UserDTO userbyid(@PathVariable Long id){
+        User user=userRepository.findById(id) .orElseThrow(() -> new RuntimeException("id not found"));
+        UserDTO userDTO = new UserDTO(user);
+        return userDTO;
+    }
 
 
 

@@ -15,6 +15,10 @@ public class SlotDTO {
         this.time = time;
         this.available = available;
     }
+    public SlotDTO(String time) {
+        this.time = time;
+
+    }
 
     public SlotDTO(String time, boolean available) {
         this.time = time;
