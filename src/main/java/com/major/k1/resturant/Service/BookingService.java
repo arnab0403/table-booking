@@ -1,5 +1,6 @@
 package com.major.k1.resturant.Service;
 
+import com.major.k1.resturant.DTO.SlotDTO;
 import com.major.k1.resturant.Entites.*;
 import com.major.k1.resturant.RazorPayDTO.*;
 
@@ -49,6 +50,7 @@ public class BookingService {
     public void init() throws RazorpayException {
         this.razorpayClient = new RazorpayClient(keyId, keySecret);
     }
+
 
     // STEP 1: Generate Razorpay Order and validate
     public RazorpayOrderResponse createOrder(BookingRequestDto requestDto, Authentication authentication) throws RazorpayException {
@@ -144,6 +146,10 @@ public class BookingService {
         booking.setBookingTime(LocalDateTime.now());
         bookingRepository.save(booking);
 
+        long idd=bookingData.getSlotId();
+        SlotTime slotTime=slotTimeRepository.findById(idd).orElseThrow(null);
+        SlotDTO slotDTO=new SlotDTO(slotTime.getTime());
+
         // Save to current bookings
         CurrentBooking currentBooking = new CurrentBooking();
         currentBooking.setUserId(user.getId());
@@ -154,6 +160,7 @@ public class BookingService {
         currentBooking.setSeats(bookingData.getNumberOfSeats());
         currentBooking.setAmount(bookingData.getAmount());
         currentBooking.setSlotTimeId(bookingData.getSlotId());
+        currentBooking.setSlotTime(slotDTO.getTime());
         currentBookingRepository.save(currentBooking);
 
         // Clean up stored session

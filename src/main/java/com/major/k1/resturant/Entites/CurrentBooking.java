@@ -23,5 +23,6 @@ public class CurrentBooking {
     private double amount;
 
     private Long slotTimeId;
+    private String slotTime;
 }
 
