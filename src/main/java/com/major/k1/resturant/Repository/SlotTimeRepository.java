@@ -18,4 +18,8 @@ public interface SlotTimeRepository extends JpaRepository<SlotTime, Long> {
     @Transactional
     @Query("UPDATE SlotTime s SET s.availableSeats = :totalSeats, s.available = true WHERE s.restaurant.id = :restaurantId")
     void resetSlotsByRestaurantId(@Param("restaurantId") Long restaurantId, @Param("totalSeats") int totalSeats);
+    @Modifying
+    @Transactional
+    @Query("UPDATE SlotTime s SET s.availableSeats = :totalSeats, s.available = true WHERE s.restaurant.id = :restaurantId and s.id =:id")
+    void resetSpecificSlot(@Param("restaurantId") Long restaurantId, @Param("totalSeats") int totalSeats,@Param("id") Long id);
 }

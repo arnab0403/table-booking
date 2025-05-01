@@ -4,8 +4,10 @@ import com.major.k1.resturant.DTO.RestaurantDTO;
 import com.major.k1.resturant.DTO.RestaurantDetailsDTO;
 import com.major.k1.resturant.DTO.RestaurantRequestDTO;
 import com.major.k1.resturant.DTO.TimeSlotDetailsDTO;
+import com.major.k1.resturant.Entites.CurrentBooking;
 import com.major.k1.resturant.Entites.Restaurant;
 import com.major.k1.resturant.Entites.SlotTime;
+import com.major.k1.resturant.Repository.CurrentBookingRepository;
 import com.major.k1.resturant.Repository.RestaurantRepository;
 import com.major.k1.resturant.Service.BookingService;
 import com.major.k1.resturant.Service.RestaurantService;
@@ -44,6 +46,8 @@ public class RestaurantController {
     private RestaurantRepository restaurantRepository;
     @Autowired
     private BookingService bookingService;
+    @Autowired
+    private CurrentBookingRepository currentBookingRepository;
     //Add New Restaurant
     @PostMapping(value = "/addrestaurant",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -162,7 +166,19 @@ public class RestaurantController {
         return ResponseEntity.ok("All slot seats reset successfully.");
     }
 
+    @PostMapping("specific-slot-reset/{restaurantId}")
+    public ResponseEntity<String> resetSpecificSlot(@PathVariable Long restaurantId,@RequestBody Long SlotId){
+        restaurantService.resetSpecifTime(restaurantId,SlotId);
+        return ResponseEntity.ok("Specific Slot reset sucessfully");
+    }
 
+
+ //List of the current-booking of the specific restaurant
+ @GetMapping("/current-booking/{restaurantId}")
+ public ResponseEntity<List<CurrentBooking>> getBookingsByRestaurant(@PathVariable Long restaurantId) {
+     List<CurrentBooking> bookings = currentBookingRepository.findByRestaurantId(restaurantId);
+     return ResponseEntity.ok(bookings);
+ }
 
 }
 

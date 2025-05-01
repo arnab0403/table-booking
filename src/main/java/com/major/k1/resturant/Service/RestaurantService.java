@@ -337,6 +337,14 @@ public class RestaurantService {
         slotTimeRepository.resetSlotsByRestaurantId(restaurantId, totalSeats);
     }
 
+    @Transactional
+    public void resetSpecifTime(Long restaurantId , Long id){
+        Restaurant restaurant=restaurantRepository.findById(restaurantId).orElseThrow( ()-> new RuntimeException("Restaurant Not Found")) ;
+
+        int totalSeats = restaurant.getTotalSeats();
+        slotTimeRepository.resetSpecificSlot(restaurantId,totalSeats,id);
+    }
+
 
 
 }
