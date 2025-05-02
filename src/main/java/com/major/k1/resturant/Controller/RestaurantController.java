@@ -129,7 +129,7 @@ public class RestaurantController {
     }
 
 
-
+   //list of restaurant owned by the owner
     @GetMapping("/restaurants/owned")
     public ResponseEntity<List<RestaurantDTO>> getRestaurantsForOwner(Authentication authentication) {
         // Fetch the username from the Authentication object
@@ -163,13 +163,13 @@ public class RestaurantController {
         return ResponseEntity.ok("Restaurant deleted successfully");
     }
 
-    //reset all slots of the specific restaurant
+    //reset all slots seats of the specific restaurant
     @PostMapping("/restaurant/{restaurantId}/reset-slots")
     public ResponseEntity<String> resetSlots(@PathVariable Long restaurantId) {
         restaurantService.resetAvailableSeats(restaurantId);
         return ResponseEntity.ok("All slot seats reset successfully.");
     }
-
+    // reset Specific slot seats
     @PostMapping("specific-slot-reset/{restaurantId}")
     public ResponseEntity<String> resetSpecificSlot(@PathVariable Long restaurantId,@RequestBody Long SlotId){
         restaurantService.resetSpecifTime(restaurantId,SlotId);
@@ -184,19 +184,15 @@ public class RestaurantController {
      return ResponseEntity.ok(bookings);
  }
 
-    @GetMapping("/user/{id}")
-    public UserDTO userbyid(@PathVariable Long id){
-        User user=userRepository.findById(id) .orElseThrow(() -> new RuntimeException("id not found"));
-        UserDTO userDTO = new UserDTO(user);
-        return userDTO;
-    }
 
-    @GetMapping("/slotBookid/{id}")
-    public SlotDTO slotdetails(@PathVariable Long id){
-        SlotTime slotTime=  slotTimeRepository.findById(id) .orElseThrow(null);
-        SlotDTO slotDTO= new SlotDTO(slotTime.getTime());
-        return slotDTO;
-    }
+// //testing
+//    @GetMapping("/res/{id}")
+// public Restaurant resreturn(@PathVariable Long id){
+//      Restaurant restaurant = restaurantRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found"));
+//        return restaurant;
+//    }
+
+
 
 }
 

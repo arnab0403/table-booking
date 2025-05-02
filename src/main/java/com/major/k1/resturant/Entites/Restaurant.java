@@ -1,7 +1,6 @@
 package com.major.k1.resturant.Entites;
 
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -30,7 +29,7 @@ public class Restaurant {
 
 
     @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
+    @JoinColumn(name = "owner_id", nullable = false )
     private User owner;
 
     //changes

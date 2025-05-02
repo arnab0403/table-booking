@@ -256,13 +256,27 @@ public class RestaurantService {
     private RestaurantDTO convertToDTO(Restaurant restaurant) {
         // Convert SlotTime entities to SlotDTOs
         List<SlotDTO> slotDTOs = restaurant.getSlotTimes().stream()
-                .map(slot -> new SlotDTO(slot.getTime(), slot.isAvailable()))
+                .map(slot -> new SlotDTO(
+                        slot.getId(),
+                        slot.getTime(),
+                        slot.isAvailable()))
                 .collect(Collectors.toList());
 
+        List<String> photoUrls = restaurant.getPhotos().stream()
+                .map(photoName ->  photoName)
+                .collect(Collectors.toList());
         // Return the RestaurantDTO
+
+
+
+
         return new RestaurantDTO(
                 restaurant.getId(),
                 restaurant.getName(),
+                restaurant.getDescription(),
+                restaurant.getPlace(),
+                restaurant.getOpenTime(),
+                photoUrls,
                 restaurant.getMenu(),
                 restaurant.getBestDishes(),
                 restaurant.getCoordinates(),
