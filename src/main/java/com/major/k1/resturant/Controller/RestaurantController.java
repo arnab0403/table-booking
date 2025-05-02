@@ -1,10 +1,7 @@
 package com.major.k1.resturant.Controller;
 
 import com.major.k1.resturant.DTO.*;
-import com.major.k1.resturant.Entites.CurrentBooking;
-import com.major.k1.resturant.Entites.Restaurant;
-import com.major.k1.resturant.Entites.SlotTime;
-import com.major.k1.resturant.Entites.User;
+import com.major.k1.resturant.Entites.*;
 import com.major.k1.resturant.Repository.CurrentBookingRepository;
 import com.major.k1.resturant.Repository.RestaurantRepository;
 import com.major.k1.resturant.Repository.SlotTimeRepository;
@@ -183,6 +180,15 @@ public class RestaurantController {
      List<CurrentBooking> bookings = currentBookingRepository.findByRestaurantId(restaurantId);
      return ResponseEntity.ok(bookings);
  }
+
+
+    @GetMapping("bookings/{restaurantId}")
+    public List<Booking> bokkings(@PathVariable Long restaurantId){
+        List<Booking> booking = restaurantService.getbooking(restaurantId);
+        return booking;
+    }
+
+
 
 
 // //testing

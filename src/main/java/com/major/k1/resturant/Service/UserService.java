@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.major.k1.resturant.DTO.OtpUserStore;
 import com.major.k1.resturant.DTO.PendingUser;
 import com.major.k1.resturant.Entites.User;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -112,6 +113,7 @@ public class UserService {
 
     public boolean changepassword(String username ,String oldpassword, String newpassword){
         User user= userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         if(!passwordEncoder.matches(oldpassword,user.getPassword())){
             return false;
         }

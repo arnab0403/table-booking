@@ -63,25 +63,17 @@ public class SecurityConfig {
                         })
                 )
 
-                // Add custom logout handling
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessHandler(customLogoutSuccessHandler())
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()
-                )
+
 
                 // Add the JWT authentication filter
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtUtil, customUserDetailsService);
-    }
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -93,11 +85,4 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-    @Bean
-    public LogoutSuccessHandler customLogoutSuccessHandler() {
-        return (HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.Authentication authentication) -> {
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.sendRedirect("/login"); // Explicitly redirect to login page
-        };
-    }
 }

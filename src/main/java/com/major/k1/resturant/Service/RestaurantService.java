@@ -2,9 +2,11 @@ package com.major.k1.resturant.Service;
 
 
 import com.major.k1.resturant.DTO.*;
+import com.major.k1.resturant.Entites.Booking;
 import com.major.k1.resturant.Entites.Restaurant;
 import com.major.k1.resturant.Entites.SlotTime;
 import com.major.k1.resturant.Entites.User;
+import com.major.k1.resturant.Repository.BookingRepository;
 import com.major.k1.resturant.Repository.RestaurantRepository;
 import com.major.k1.resturant.Repository.SlotTimeRepository;
 import com.major.k1.resturant.Repository.UserRepository;
@@ -357,6 +359,13 @@ public class RestaurantService {
 
         int totalSeats = restaurant.getTotalSeats();
         slotTimeRepository.resetSpecificSlot(restaurantId,totalSeats,id);
+    }
+    @Autowired
+    BookingRepository bookingRepository;
+    // All booking of a restaurant
+    public List<Booking> getbooking(Long restaurantId){
+        List<Booking> booking = bookingRepository.findByRestaurantId(restaurantId);
+        return booking;
     }
 
 

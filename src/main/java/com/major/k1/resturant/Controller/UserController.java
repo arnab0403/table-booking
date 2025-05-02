@@ -2,9 +2,11 @@ package com.major.k1.resturant.Controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.major.k1.resturant.DTO.*;
+import com.major.k1.resturant.Entites.Booking;
 import com.major.k1.resturant.Entites.User;
 import com.major.k1.resturant.Repository.UserRepository;
 import com.major.k1.resturant.Security.JwtUtil;
+import com.major.k1.resturant.Service.RestaurantService;
 import com.major.k1.resturant.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -37,6 +40,8 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RestaurantService restaurantService;
 
     @PostMapping(value = "/register-temp", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> registerTemp(@RequestPart("user") String userJson,
