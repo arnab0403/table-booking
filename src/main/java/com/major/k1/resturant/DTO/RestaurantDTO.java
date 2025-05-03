@@ -16,10 +16,11 @@ public class RestaurantDTO {
     private String place;
     private String openTime;
     private List<String> photos;
-    private List<String> menu;
+    private List<MenuDto> menu;
     private List<String> bestDishes;
     private Coordinates coordinates;
     private List<SlotDTO> slotTimes;
+
 
 
 }

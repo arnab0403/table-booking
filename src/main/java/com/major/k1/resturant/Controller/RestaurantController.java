@@ -82,7 +82,7 @@ public class RestaurantController {
 
     //Add new menu to a specific restaurant
     @PostMapping("/{restaurantId}/menu")
-    public ResponseEntity<Restaurant> addMenuItem(@PathVariable Long restaurantId, @RequestBody String menuItem) {
+    public ResponseEntity<Restaurant> addMenuItem(@PathVariable Long restaurantId, @RequestBody MenuDto menuItem) {
         Restaurant restaurant = restaurantService.addMenuItem(restaurantId, menuItem);
         return ResponseEntity.ok(restaurant);
     }

@@ -15,8 +15,8 @@ public class Restaurant {
 
     private String name;
 
-    @ElementCollection
-    private List<String> menu = new ArrayList<>();
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Menu> menu = new ArrayList<>();
 
     @ElementCollection
     private List<String> bestDishes = new ArrayList<>();

@@ -11,7 +11,7 @@ public class RestaurantRequestDTO {
     private String description;
     private String place;
     private String openTime;
-    private List<String> menu;
+    private List<MenuDto> menu;
     private List<String> bestDishes;
     private Coordinates coordinates;
     private List<String> slotTimes;

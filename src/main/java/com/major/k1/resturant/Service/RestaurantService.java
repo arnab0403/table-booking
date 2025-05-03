@@ -2,16 +2,14 @@ package com.major.k1.resturant.Service;
 
 
 import com.major.k1.resturant.DTO.*;
-import com.major.k1.resturant.Entites.Booking;
-import com.major.k1.resturant.Entites.Restaurant;
-import com.major.k1.resturant.Entites.SlotTime;
-import com.major.k1.resturant.Entites.User;
+import com.major.k1.resturant.Entites.*;
 import com.major.k1.resturant.Repository.BookingRepository;
 import com.major.k1.resturant.Repository.RestaurantRepository;
 import com.major.k1.resturant.Repository.SlotTimeRepository;
 import com.major.k1.resturant.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.aspectj.weaver.patterns.ConcreteCflowPointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
@@ -56,7 +54,7 @@ public class RestaurantService {
         restaurant.setDescription(dto.getDescription());
         restaurant.setPlace(dto.getPlace());
         restaurant.setOpenTime(dto.getOpenTime());
-        restaurant.setMenu(dto.getMenu());
+
         restaurant.setBestDishes(dto.getBestDishes());
         restaurant.setCoordinates(dto.getCoordinates());
         restaurant.setOwner(owner);
@@ -67,6 +65,17 @@ public class RestaurantService {
             List<String> photoNames = handleFileUploads(dto.getPhotos());
             restaurant.setPhotos(photoNames);
         }
+
+        List<Menu> menus = dto.getMenu().stream()
+                .map(m -> {
+                    Menu menu=new Menu();
+                    menu.setRestaurant(restaurant);
+                    menu.setItem(m.getItem());
+                    menu.setPrice(m.getPrice());
+                    return menu;
+                        }
+
+                ).collect(Collectors.toList());
 
         // Handle slot times and set availableSeats for each
         List<SlotTime> slotTimeList = dto.getSlotTimes().stream()
@@ -122,10 +131,18 @@ public class RestaurantService {
 
 
          // Menu  add method
-    public Restaurant addMenuItem(Long restaurantId, String menuItem) {
+    public Restaurant addMenuItem(Long restaurantId, MenuDto menuDto) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+        // Convert DTO to entity
+        Menu menuItem = new Menu();
+        menuItem.setItem(menuDto.getItem());
+        menuItem.setPrice(menuDto.getPrice());
+        menuItem.setRestaurant(restaurant); // 🔁 important!
+
+        // Add to restaurant's menu list
         restaurant.getMenu().add(menuItem);
+
         return restaurantRepository.save(restaurant);
     }
 
@@ -178,6 +195,12 @@ public class RestaurantService {
             List<SlotDTO> slotTimes = restaurant.getSlotTimes().stream()
                     .map(slotTime -> new SlotDTO(slotTime.getId(), slotTime.getTime(), slotTime.isAvailable()))
                     .collect(Collectors.toList());
+            List<MenuDto> menus=restaurant.getMenu().stream().map(
+                    menu -> new MenuDto(
+                            menu.getItem(),
+                            menu.getPrice()
+                    )
+            ).collect(Collectors.toList());
 
             // Return RestaurantDTO with all fields
             return new RestaurantDTO(
@@ -187,7 +210,7 @@ public class RestaurantService {
                     restaurant.getPlace(),
                     restaurant.getOpenTime(),
                     restaurant.getPhotos(),
-                    restaurant.getMenu(),
+                    menus,
                     restaurant.getBestDishes(),
                     restaurant.getCoordinates(),
                     slotTimes
@@ -210,10 +233,18 @@ public class RestaurantService {
                 ))
                 .collect(Collectors.toList());
 
+        List<MenuDto> menus = restaurant.getMenu().stream()
+                .map(menu -> new MenuDto(
+                        menu.getItem(),
+                        menu.getPrice()
+                )).collect(Collectors.toList());
+
         // Build photo URLs (assuming photos are stored with base URL)
         List<String> photoUrls = restaurant.getPhotos().stream()
                 .map(photoName ->  photoName)
                 .collect(Collectors.toList());
+
+
 
         return new RestaurantDetailsDTO(
                 restaurant.getId(),
@@ -222,7 +253,7 @@ public class RestaurantService {
                 restaurant.getPlace(),
                 restaurant.getOpenTime(),
                 photoUrls, // Now includes full photo URLs
-                restaurant.getMenu(),
+                menus,
                 restaurant.getBestDishes(),
                 restaurant.getCoordinates(),
                 slotTimes,
@@ -269,7 +300,11 @@ public class RestaurantService {
                 .collect(Collectors.toList());
         // Return the RestaurantDTO
 
-
+        List<MenuDto> menus = restaurant.getMenu().stream()
+                .map(menu -> new MenuDto(
+                        menu.getItem(),
+                        menu.getPrice()
+                )).collect(Collectors.toList());
 
 
         return new RestaurantDTO(
@@ -279,7 +314,7 @@ public class RestaurantService {
                 restaurant.getPlace(),
                 restaurant.getOpenTime(),
                 photoUrls,
-                restaurant.getMenu(),
+                menus,
                 restaurant.getBestDishes(),
                 restaurant.getCoordinates(),
                 slotDTOs
@@ -367,7 +402,6 @@ public class RestaurantService {
         List<Booking> booking = bookingRepository.findByRestaurantId(restaurantId);
         return booking;
     }
-
 
 
 }
