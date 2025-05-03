@@ -1,8 +1,6 @@
 package com.major.k1.resturant.Entites;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,10 +8,15 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 public class Menu {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String item;
     private double  price;
-    @ManyToMany
+
+    @ManyToOne
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
+
 
 }

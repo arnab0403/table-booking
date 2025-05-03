@@ -188,6 +188,7 @@ public class RestaurantService {
 
 
     public List<RestaurantDTO> getAllRestaurants() {
+        // Fetch all restaurants from the repository
         List<Restaurant> restaurants = restaurantRepository.findAll();
 
         return restaurants.stream().map(restaurant -> {
@@ -195,14 +196,13 @@ public class RestaurantService {
             List<SlotDTO> slotTimes = restaurant.getSlotTimes().stream()
                     .map(slotTime -> new SlotDTO(slotTime.getId(), slotTime.getTime(), slotTime.isAvailable()))
                     .collect(Collectors.toList());
-            List<MenuDto> menus=restaurant.getMenu().stream().map(
-                    menu -> new MenuDto(
-                            menu.getItem(),
-                            menu.getPrice()
-                    )
-            ).collect(Collectors.toList());
 
-            // Return RestaurantDTO with all fields
+            // Convert Menus to MenuDTOs
+            List<MenuDto> menus = restaurant.getMenu().stream()
+                    .map(menu -> new MenuDto(menu.getItem(), menu.getPrice()))
+                    .collect(Collectors.toList());
+
+            // Convert the Restaurant entity to RestaurantDTO
             return new RestaurantDTO(
                     restaurant.getId(),
                     restaurant.getName(),
@@ -210,12 +210,12 @@ public class RestaurantService {
                     restaurant.getPlace(),
                     restaurant.getOpenTime(),
                     restaurant.getPhotos(),
-                    menus,
+                    menus,  // List of MenuDTOs
                     restaurant.getBestDishes(),
                     restaurant.getCoordinates(),
-                    slotTimes
+                    slotTimes // List of SlotDTOs
             );
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()); // Collect the list of RestaurantDTOs
     }
 
 
